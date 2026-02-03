@@ -1,0 +1,35 @@
+body {
+    background-color: #eef2f7;   /* light bluish background */
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #333;
+}
+
+.frame-box {
+    text-align: center;
+    margin: 30px auto;
+    padding: 20px;
+    width: 80%;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.links {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.links a {
+    text-decoration: none;
+    color: #0066cc;        /* calm blue */
+    font-weight: 600;
+    margin: 0 12px;
+    padding: 8px 14px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.links a:hover {
+    background-color: #0066cc;
+    color: #ffffff;
+}
