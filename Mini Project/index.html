@@ -1,0 +1,1314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>♻️ EcoSmart Waste Management System</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #0a0f0e;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+
+        /* App Layout */
+        .app-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 280px;
+            background: #0c1210;
+            border-right: 1px solid #2a2f2e;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid #2a2f2e;
+        }
+
+        .sidebar-header i {
+            font-size: 2.5rem;
+            color: #0fef7a;
+        }
+
+        .sidebar-header h2 {
+            margin-top: 0.5rem;
+            background: linear-gradient(135deg, #d0ffb0, #0fef7a);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .user-info {
+            padding: 1rem;
+            background: #111615;
+            margin: 1rem;
+            border-radius: 1rem;
+            text-align: center;
+        }
+
+        .user-info i {
+            font-size: 2rem;
+            color: #0fef7a;
+        }
+
+        .credits-badge {
+            background: #1e3a2a;
+            padding: 0.3rem;
+            border-radius: 2rem;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0;
+        }
+
+        .nav-item {
+            margin: 0.5rem 1rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem 1rem;
+            color: #e0e0e0;
+            text-decoration: none;
+            border-radius: 1rem;
+            transition: all 0.3s;
+        }
+
+        .nav-link i {
+            width: 24px;
+            font-size: 1.2rem;
+        }
+
+        .nav-link:hover {
+            background: #1a201f;
+            color: #0fef7a;
+        }
+
+        .nav-link.active {
+            background: #0fef7a;
+            color: #0a0f0e;
+        }
+
+        .logout-btn {
+            margin: 1rem;
+            padding: 0.8rem;
+            background: transparent;
+            border: 1px solid #ef3f0f;
+            color: #ef3f0f;
+            border-radius: 1rem;
+            cursor: pointer;
+            width: calc(100% - 2rem);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .logout-btn:hover {
+            background: #ef3f0f;
+            color: #fff;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            min-height: 100vh;
+            background: #0b0f0e;
+        }
+
+        /* Page Container */
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .page.active-page {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Header */
+        .page-header {
+            background: #0c1210;
+            border-bottom: 1px solid #2a2f2e;
+            padding: 1rem 2rem;
+        }
+
+        .page-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .page-content {
+            padding: 2rem;
+        }
+
+        /* Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: #111615;
+            border: 1px solid #2a2f2e;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-card i {
+            font-size: 2rem;
+            color: #0fef7a;
+        }
+
+        .stat-card h3 {
+            font-size: 2rem;
+            margin: 0.5rem 0;
+        }
+
+        .green-card {
+            background: linear-gradient(135deg, #1a3a2a, #0a2a1a);
+            border-color: #0fef7a;
+        }
+
+        .section-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: #111615;
+            border: 1px solid #2a2f2e;
+            border-radius: 1rem;
+            padding: 1.5rem;
+        }
+
+        .card h3 {
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.8rem;
+            background: #1a201f;
+            border: 1px solid #2d3533;
+            border-radius: 0.8rem;
+            color: #e0e0e0;
+            outline: none;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #0fef7a;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 0.8rem;
+            background: #0fef7a;
+            border: none;
+            border-radius: 2rem;
+            color: #0a0f0e;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background: #0bd46e;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid #0fef7a;
+            color: #0fef7a;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            cursor: pointer;
+        }
+
+        .request-item, .complaint-item, .centre-item {
+            background: #0f1412;
+            border-radius: 0.8rem;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            border-left: 3px solid #0fef7a;
+        }
+
+        .status-pending {
+            background: #ffb34720;
+            color: #ffb347;
+            padding: 0.2rem 0.6rem;
+            border-radius: 1rem;
+            font-size: 0.7rem;
+        }
+
+        .status-completed, .status-resolved {
+            background: #0fef7a20;
+            color: #0fef7a;
+            padding: 0.2rem 0.6rem;
+            border-radius: 1rem;
+            font-size: 0.7rem;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1e2a26;
+            border-left: 4px solid #0fef7a;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 200;
+            background: #0fef7a;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+            .section-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="mobile-menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    <div class="app-wrapper">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-leaf"></i>
+                <h2>EcoSmart Waste</h2>
+            </div>
+            <div class="user-info" id="userInfoSidebar">
+                <i class="fas fa-user-circle"></i>
+                <div id="sidebarUserName">Loading...</div>
+                <div class="credits-badge" id="sidebarCredits"><i class="fas fa-coins"></i> 0 GC</div>
+            </div>
+            <ul class="nav-menu" id="navMenu">
+                <!-- Navigation will be populated by JS -->
+            </ul>
+            <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content" id="mainContent">
+            <!-- Pages will be loaded here -->
+        </div>
+    </div>
+
+    <script>
+        // Storage Keys
+        const STORAGE_USERS = "ecosmart_users";
+        const STORAGE_REQUESTS = "ecosmart_requests";
+        const STORAGE_COMPLAINTS = "ecosmart_complaints";
+        const STORAGE_EWASTE = "ecosmart_ewaste";
+        const STORAGE_CREDITS = "ecosmart_credits";
+
+        // Initialize Data
+        function initData() {
+            if (!localStorage.getItem(STORAGE_USERS)) {
+                localStorage.setItem(STORAGE_USERS, JSON.stringify([
+                    { id: 1, name: "Admin User", email: "admin@ecosmart.com", password: "admin123", role: "admin" },
+                    { id: 2, name: "Sarah Citizen", email: "citizen@ecosmart.com", password: "citizen123", role: "user" }
+                ]));
+            }
+            if (!localStorage.getItem(STORAGE_REQUESTS)) {
+                localStorage.setItem(STORAGE_REQUESTS, JSON.stringify([
+                    { id: 101, user_id: 2, waste_type: "Household", address: "123 Green Street", date: "2026-04-10", timeSlot: "Morning", status: "Pending", credits: 5 },
+                    { id: 102, user_id: 2, waste_type: "Recyclable", address: "123 Green Street", date: "2026-04-05", timeSlot: "Afternoon", status: "Completed", credits: 5 }
+                ]));
+            }
+            if (!localStorage.getItem(STORAGE_COMPLAINTS)) {
+                localStorage.setItem(STORAGE_COMPLAINTS, JSON.stringify([
+                    { id: 201, user_id: 2, description: "Overflowing bins near Central Park", location: "Central Park", lat: "40.7128", lng: "-74.0060", status: "Pending", date: "2026-04-01" }
+                ]));
+            }
+            if (!localStorage.getItem(STORAGE_EWASTE)) {
+                localStorage.setItem(STORAGE_EWASTE, JSON.stringify([]));
+            }
+            if (!localStorage.getItem(STORAGE_CREDITS)) {
+                localStorage.setItem(STORAGE_CREDITS, JSON.stringify({ 1: 0, 2: 250 }));
+            }
+        }
+
+        // Helper Functions
+        function getUserCredits(userId) {
+            let credits = JSON.parse(localStorage.getItem(STORAGE_CREDITS));
+            return credits[userId] || 0;
+        }
+
+        function addCredits(userId, amount) {
+            let credits = JSON.parse(localStorage.getItem(STORAGE_CREDITS));
+            credits[userId] = (credits[userId] || 0) + amount;
+            localStorage.setItem(STORAGE_CREDITS, JSON.stringify(credits));
+            showToast(`+${amount} Green Credits Earned! 🌱`, "success");
+            updateSidebarInfo();
+        }
+
+        function showToast(msg, type) {
+            let toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i> ${msg}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Recycling Centres
+        const recyclingCentres = [
+            { name: "🌿 Green Earth Recycling", address: "123 Eco Blvd, Downtown", distance: "0.3 km", rewards: "+10 GC/kg" },
+            { name: "💻 E-Waste Solutions", address: "456 Tech Park", distance: "0.8 km", rewards: "+15 GC/item" },
+            { name: "🌱 Organic Waste Hub", address: "789 Garden Road", distance: "1.2 km", rewards: "+5 GC/kg" },
+            { name: "🔩 Metal Recovery", address: "101 Industry Lane", distance: "2.0 km", rewards: "+20 GC/kg" },
+            { name: "🏥 Hazardous Waste Facility", address: "202 Safety Ave", distance: "2.5 km", rewards: "+25 GC/kg" }
+        ];
+
+        let currentUser = null;
+        let currentPage = 'dashboard';
+        let wasteChart = null;
+        let adminChart = null;
+
+        // Navigation Items
+        const userNavItems = [
+            { id: 'dashboard', icon: 'fa-tachometer-alt', label: 'Dashboard' },
+            { id: 'pickup', icon: 'fa-truck', label: 'Schedule Pickup' },
+            { id: 'ewaste', icon: 'fa-laptop-code', label: 'E-Waste Collection' },
+            { id: 'complaints', icon: 'fa-exclamation-triangle', label: 'Report Complaint' },
+            { id: 'centres', icon: 'fa-map-marker-alt', label: 'Recycling Centres' },
+            { id: 'history', icon: 'fa-history', label: 'My Activity' }
+        ];
+
+        const adminNavItems = [
+            { id: 'dashboard', icon: 'fa-tachometer-alt', label: 'Overview' },
+            { id: 'requests', icon: 'fa-tasks', label: 'Manage Requests' },
+            { id: 'complaints', icon: 'fa-flag', label: 'Manage Complaints' },
+            { id: 'analytics', icon: 'fa-chart-line', label: 'Analytics' },
+            { id: 'citizens', icon: 'fa-users', label: 'Citizens' }
+        ];
+
+        // Page Rendering Functions
+        function renderUserDashboard() {
+            let credits = getUserCredits(currentUser.id);
+            let requests = JSON.parse(localStorage.getItem(STORAGE_REQUESTS)).filter(r => r.user_id === currentUser.id);
+            let completed = requests.filter(r => r.status === 'Completed').length;
+            let eWaste = JSON.parse(localStorage.getItem(STORAGE_EWASTE)).filter(e => e.user_id === currentUser.id);
+            
+            return `
+                <div class="page-header">
+                    <h1><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
+                </div>
+                <div class="page-content">
+                    <div class="stats-grid">
+                        <div class="stat-card green-card">
+                            <i class="fas fa-seedling"></i>
+                            <h3>${credits}</h3>
+                            <p>Green Credits</p>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-truck"></i>
+                            <h3>${requests.length}</h3>
+                            <p>Total Pickups</p>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-check-circle"></i>
+                            <h3>${completed}</h3>
+                            <p>Completed</p>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-laptop"></i>
+                            <h3>${eWaste.length}</h3>
+                            <p>E-Waste Items</p>
+                        </div>
+                    </div>
+
+                    <div class="section-grid">
+                        <div class="card">
+                            <h3><i class="fas fa-chart-pie"></i> Waste Composition</h3>
+                            <canvas id="wasteChart" height="200"></canvas>
+                            <div style="margin-top: 1rem; font-size: 0.75rem; text-align: center;">
+                                <span style="color: #0fef7a;">● Organic 35%</span>
+                                <span style="color: #0f7aef;">● Recyclable 25%</span>
+                                <span style="color: #ef7a0f;">● E-Waste 15%</span>
+                                <span style="color: #ef3f0f;">● Hazardous 10%</span>
+                                <span style="color: #9b59b6;">● Other 15%</span>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <h3><i class="fas fa-clock"></i> Recent Activity</h3>
+                            <div style="max-height: 250px; overflow-y: auto;">
+                                ${requests.slice(0, 3).map(r => `
+                                    <div class="request-item">
+                                        <i class="fas fa-truck"></i> ${r.waste_type} - ${r.date}
+                                        <span class="${r.status === 'Pending' ? 'status-pending' : 'status-completed'}">${r.status}</span>
+                                    </div>
+                                `).join('')}
+                                ${eWaste.slice(0, 3).map(e => `
+                                    <div class="request-item">
+                                        <i class="fas fa-laptop"></i> ${e.item} x${e.quantity}
+                                        <span class="${e.status === 'Pending' ? 'status-pending' : 'status-completed'}">${e.status}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPickupPage() {
+            return `
+                <div class="page-header">
+                    <h1><i class="fas fa-truck"></i> Schedule Waste Pickup</h1>
+                </div>
+                <div class="page-content">
+                    <div class="section-grid">
+                        <div class="card">
+                            <h3>Request Details</h3>
+                            <form onsubmit="event.preventDefault(); schedulePickup()">
+                                <div class="form-group">
+                                    <textarea id="pickupAddress" rows="2" placeholder="Pickup Address" required></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <select id="wasteType">
+                                        <option value="Household">🏠 Household Waste</option>
+                                        <option value="Recyclable">♻️ Recyclable</option>
+                                        <option value="Organic">🌿 Organic</option>
+                                        <option value="Hazardous">⚠️ Hazardous</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <input type="date" id="pickupDate" required>
+                                </div>
+                                <div class="form-group">
+                                    <select id="timeSlot">
+                                        <option>Morning (8am-12pm)</option>
+                                        <option>Afternoon (12pm-4pm)</option>
+                                        <option>Evening (4pm-8pm)</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn-primary">Request Pickup (+5 Credits)</button>
+                            </form>
+                            <div id="pickupMsg" style="margin-top: 1rem;"></div>
+                        </div>
+                        <div class="card">
+                            <h3><i class="fas fa-info-circle"></i> Pickup Information</h3>
+                            <p>✅ Regular pickup earns <strong>5 Green Credits</strong></p>
+                            <p>✅ Recyclable waste earns bonus credits</p>
+                            <p>✅ Hazardous waste requires special handling</p>
+                            <p>✅ Pickups are scheduled within 24 hours</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderEwastePage() {
+            return `
+                <div class="page-header">
+                    <h1><i class="fas fa-laptop-code"></i> E-Waste Collection</h1>
+                </div>
+                <div class="page-content">
+                    <div class="section-grid">
+                        <div class="card">
+                            <h3>Request E-Waste Pickup</h3>
+                            <form onsubmit="event.preventDefault(); requestEwaste()">
+                                <div class="form-group">
+                                    <input type="text" id="ewasteItem" placeholder="Item (Laptop, Phone, etc.)" required>
+                                </div>
+                                <div class="form-group">
+                                    <select id="ewasteCategory">
+                                        <option>Mobile Phone</option>
+                                        <option>Laptop</option>
+                                        <option>Desktop</option>
+                                        <option>Printer</option>
+                                        <option>Battery</option>
+                                        <option>TV/Monitor</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <input type="number" id="ewasteQty" placeholder="Quantity" min="1" value="1">
+                                </div>
+                                <button type="submit" class="btn-primary">Request E-Waste Pickup (+15 Credits)</button>
+                            </form>
+                            <div id="ewasteMsg" style="margin-top: 1rem;"></div>
+                        </div>
+                        <div class="card">
+                            <h3><i class="fas fa-recycle"></i> Why Recycle E-Waste?</h3>
+                            <p>💚 <strong>+15 Green Credits</strong> per item</p>
+                            <p>♻️ Prevents toxic materials from landfills</p>
+                            <p>🔋 Recovers valuable metals and components</p>
+                            <p>🌍 Reduces carbon footprint significantly</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderComplaintsPage() {
+            return `
+                <div class="page-header">
+                    <h1><i class="fas fa-exclamation-triangle"></i> Report Illegal Dumpsite</h1>
+                </div>
+                <div class="page-content">
+                    <div class="section-grid">
+                        <div class="card">
+                            <h3>File a Complaint</h3>
+                            <form onsubmit="event.preventDefault(); submitComplaint()">
+                                <div class="form-group">
+                                    <textarea id="complaintDesc" rows="2" placeholder="Describe the issue (illegal dumping, overflowing bins, etc.)" required></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" id="complaintLocation" placeholder="Location address" required>
+                                </div>
+                                <button type="button" class="btn-secondary" onclick="getLocation()" style="margin-bottom: 0.5rem; width: 100%;">
+                                    <i class="fas fa-map-pin"></i> 📍 Tag My Current Location
+                                </button>
+                                <input type="hidden" id="complaintLat">
+                                <input type="hidden" id="complaintLng">
+                                <button type="submit" class="btn-primary">Submit Geo-tagged Complaint</button>
+                            </form>
+                            <div id="complaintMsg" style="margin-top: 1rem;"></div>
+                        </div>
+                        <div class="card">
+                            <h3><i class="fas fa-gavel"></i> What Happens Next?</h3>
+                            <p>1️⃣ Your complaint is geo-tagged and recorded</p>
+                            <p>2️⃣ Admin reviews the complaint within 24 hours</p>
+                            <p>3️⃣ Cleaning crew is dispatched to the location</p>
+                            <p>4️⃣ You get notified when resolved</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCentresPage() {
+            return `
+                <div class="page-header">
+                    <h1><i class="fas fa-map-marker-alt"></i> Nearby Recycling Centres</h1>
+                </div>
+                <div class="page-content">
+                    <div class="section-grid">
+                        <div class="card">
+                            <h3>Recycling Centres Near You</h3>
+                            <button class="btn-secondary" onclick="getUserLocationCentres()" style="margin-bottom: 1rem; width: 100%;">
+                                <i class="fas fa-location-dot"></i> Show Centres Near My Location
+                            </button>
+                            <div id="userLocationDisplay" style="margin-bottom: 1rem; font-size: 0.8rem;"></div>
+                            <div id="centresList">
+                                ${recyclingCentres.map(c => `
+                                    <div class="centre-item">
+                                        <strong>${c.name}</strong><br>
+                                        📍 ${c.address} (${c.distance})<br>
+                                        💚 Rewards: ${c.rewards}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <div class="card">
+                            <h3><i class="fas fa-question-circle"></i> Accepted Items</h3>
+                            <p><strong>Green Earth Recycling:</strong> Plastic, Paper, Glass, Cardboard</p>
+                            <p><strong>E-Waste Solutions:</strong> Electronics, Batteries, Cables</p>
+                            <p><strong>Organic Waste Hub:</strong> Food waste, Garden waste</p>
+                            <p><strong>Metal Recovery:</strong> Scrap metal, Cans, Aluminum</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderHistoryPage() {
+            let requests = JSON.parse(localStorage.getItem(STORAGE_REQUESTS)).filter(r => r.user_id === currentUser.id);
+            let eWaste = JSON.parse(localStorage.getItem(STORAGE_EWASTE)).filter(e => e.user_id === currentUser.id);
+            let complaints = JSON.parse(localStorage.getItem(STORAGE_COMPLAINTS)).filter(c => c.user_id === currentUser.id);
+
+            return `
+                <div class="page-header">
+                    <h1><i class="fas fa-history"></i> My Activity History</h1>
+                </div>
+                <div class="page-content">
+                    <div class="card">
+                        <h3><i class="fas fa-truck"></i> Pickup Requests</h3>
+                        ${requests.map(r => `
+                            <div class="request-item">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <strong>${r.waste_type}</strong>
+                                    <span class="${r.status === 'Pending' ? 'status-pending' : 'status-completed'}">${r.status}</span>
+                                </div>
+                                <div>📍 ${r.address}</div>
+                                <div>📅 ${r.date} | ${r.timeSlot}</div>
+                                <div>💚 +${r.credits} Green Credits</div>
+                            </div>
+                        `).join('') || '<div style="text-align: center; padding: 2rem;">No pickup requests yet</div>'}
+                    </div>
+
+                    <div class="card" style="margin-top: 1.5rem;">
+                        <h3><i class="fas fa-laptop"></i> E-Waste Requests</h3>
+                        ${eWaste.map(e => `
+                            <div class="request-item">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <strong>${e.item} x${e.quantity}</strong>
+                                    <span class="${e.status === 'Pending' ? 'status-pending' : 'status-completed'}">${e.status}</span>
+                                </div>
+                                <div>📅 ${e.date}</div>
+                                <div>💚 +${e.credits} Green Credits</div>
+                            </div>
+                        `).join('') || '<div style="text-align: center; padding: 2rem;">No e-waste requests yet</div>'}
+                    </div>
+
+                    <div class="card" style="margin-top: 1.5rem;">
+                        <h3><i class="fas fa-flag"></i> Complaints</h3>
+                        ${complaints.map(c => `
+                            <div class="complaint-item">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <strong>${c.description.substring(0, 50)}...</strong>
+                                    <span class="${c.status === 'Pending' ? 'status-pending' : 'status-resolved'}">${c.status}</span>
+                                </div>
+                                <div>📍 ${c.location}</div>
+                                <div>📅 ${c.date}</div>
+                                ${c.lat !== "Not tagged" ? `<div>📡 Geo-tagged</div>` : ''}
+                            </div>
+                        `).join('') || '<div style="text-align: center; padding: 2rem;">No complaints filed yet</div>'}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Admin Pages
+        function renderAdminOverview() {
+            let users = JSON.parse(localStorage.getItem(STORAGE_USERS));
+            let requests = JSON.parse(localStorage.getItem(STORAGE_REQUESTS));
+            let eWaste = JSON.parse(localStorage.getItem(STORAGE_EWASTE));
+            let complaints = JSON.parse(localStorage.getItem(STORAGE_COMPLAINTS));
+            let credits = JSON.parse(localStorage.getItem(STORAGE_CREDITS));
+            let totalCredits = Object.values(credits).reduce((a, b) => a + b, 0);
+            let pendingRequests = [...requests, ...eWaste].filter(r => r.status === 'Pending').length;
+
+            return `
+                <div class="page-header">
+                    <h1><i class="fas fa-tachometer-alt"></i> Admin Overview</h1>
+                </div>
+                <div class="page-content">
+                    <div class="stats-grid">
+                        <div class="stat-card"><i class="fas fa-users"></i><h3>${users.filter(u => u.role === 'user').length}</h3><p>Citizens</p></div>
+                        <div class="stat-card"><i class="fas fa-truck"></i><h3>${requests.length + eWaste.length}</h3><p>Total Pickups</p></div>
+                        <div class="stat-card"><i class="fas fa-clock"></i><h3>${pendingRequests}</h3><p>Pending Requests</p></div>
+                        <div class="stat-card"><i class="fas fa-bug"></i><h3>${complaints.length}</h3><p>Complaints</p></div>
+                        <div class="stat-card"><i class="fas fa-leaf"></i><h3>${totalCredits}</h3><p>Credits Issued</p></div>
+                    </div>
+                    <div class="section-grid">
+                        <div class="card">
+                            <h3><i class="fas fa-chart-pie"></i> Waste Composition</h3>
+                            <canvas id="adminWasteChart" height="200"></canvas>
+                        </div>
+                        <div class="card">
+                            <h3><i class="fas fa-exclamation-triangle"></i> Recent Complaints</h3>
+                            <div style="max-height: 250px; overflow-y: auto;">
+                                ${complaints.slice(0, 3).map(c => `
+                                    <div class="complaint-item">
+                                        <strong>#${c.id}</strong> - ${c.description.substring(0, 40)}<br>
+                                        📍 ${c.location}
+                                    </div>
+                                `).join('') || '<div>No complaints</div>'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAdminRequests() {
+            let requests = JSON.parse(localStorage.getItem(STORAGE_REQUESTS));
+            let eWaste = JSON.parse(localStorage.getItem(STORAGE_EWASTE));
+            let users = JSON.parse(localStorage.getItem(STORAGE_USERS));
+
+            return `
+                <div class="page-header">
+                    <h1><i class="fas fa-tasks"></i> Manage Requests</h1>
+                </div>
+                <div class="page-content">
+                    <div class="card">
+                        <h3><i class="fas fa-truck"></i> All Pickup Requests</h3>
+                        ${[...requests, ...eWaste].map(r => {
+                            let user = users.find(u => u.id === r.user_id);
+                            return `
+                                <div class="request-item">
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <strong>${r.waste_type || r.item}</strong>
+                                        <span class="${r.status === 'Pending' ? 'status-pending' : 'status-completed'}">${r.status}</span>
+                                    </div>
+                                    <div>👤 ${user ? user.name : 'Unknown'}</div>
+                                    <div>📍 ${r.address || r.category}</div>
+                                    <div>📅 ${r.date || 'Today'}</div>
+                                    ${r.status === 'Pending' ? `<button class="btn-secondary" onclick="completeRequest(${r.id})" style="margin-top: 0.5rem;">✓ Mark Completed</button>` : ''}
+                                </div>
+                            `;
+                        }).join('') || '<div style="text-align: center; padding: 2rem;">No requests found</div>'}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAdminComplaints() {
+            let complaints = JSON.parse(localStorage.getItem(STORAGE_COMPLAINTS));
+            let users = JSON.parse(localStorage.getItem(STORAGE_USERS));
+
+            return `
+                <div class="page-header">
+                    <h1><i class="fas fa-flag"></i> Manage Complaints</h1>
+                </div>
+                <div class="page-content">
+                    <div class="card">
+                        <h3><i class="fas fa-list"></i> All Complaints (Geo-tagged)</h3>
+                        ${complaints.map(c => {
+                            let user = users.find(u => u.id === c.user_id);
+                            return `
+                                <div class="complaint-item">
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <strong>#${c.id} - ${c.description}</strong>
+                                        <span class="${c.status === 'Pending' ? 'status-pending' : 'status-resolved'}">${c.status}</span>
+                                    </div>
+                                    <div>👤 Reported by: ${user ? user.name : 'Unknown'}</div>
+                                    <div>📍 Location: ${c.location}</div>
+                                    ${c.lat !== "Not tagged" ? `<div>📡 GPS: ${c.lat}, ${c.lng}</div>` : ''}
+                                    <div>📅 Date: ${c.date}</div>
+                                    ${c.status === 'Pending' ? `<button class="btn-secondary" onclick="resolveComplaint(${c.id})" style="margin-top: 0.5rem;">✓ Mark Resolved</button>` : ''}
+                                </div>
+                            `;
+                        }).join('') || '<div style="text-align: center; padding: 2rem;">No complaints found</div>'}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAdminAnalytics() {
+            let requests = JSON.parse(localStorage.getItem(STORAGE_REQUESTS));
+            let eWaste = JSON.parse(localStorage.getItem(STORAGE_EWASTE));
+            let complaints = JSON.parse(localStorage.getItem(STORAGE_COMPLAINTS));
+            let credits = JSON.parse(localStorage.getItem(STORAGE_CREDITS));
+
+            let wasteTypes = {};
+            [...requests, ...eWaste].forEach(r => {
+                let type = r.waste_type || r.category || 'E-Waste';
+                wasteTypes[type] = (wasteTypes[type] || 0) + 1;
+            });
+
+            return `
+                <div class="page-header">
+                    <h1><i class="fas fa-chart-line"></i> Analytics Dashboard</h1>
+                </div>
+                <div class="page-content">
+                    <div class="stats-grid">
+                        <div class="stat-card"><i class="fas fa-chart-bar"></i><h3>${requests.length + eWaste.length}</h3><p>Total Collections</p></div>
+                        <div class="stat-card"><i class="fas fa-check-circle"></i><h3>${[...requests, ...eWaste].filter(r => r.status === 'Completed').length}</h3><p>Completed</p></div>
+                        <div class="stat-card"><i class="fas fa-chart-line"></i><h3>${Math.round(([...requests, ...eWaste].filter(r => r.status === 'Completed').length / (requests.length + eWaste.length || 1)) * 100)}%</h3><p>Completion Rate</p></div>
+                    </div>
+                    <div class="section-grid">
+                        <div class="card">
+                            <h3><i class="fas fa-chart-pie"></i> Waste by Type</h3>
+                            <canvas id="wasteTypeChart" height="200"></canvas>
+                        </div>
+                        <div class="card">
+                            <h3><i class="fas fa-chart-bar"></i> Key Metrics</h3>
+                            <div style="margin-top: 1rem;">
+                                <p>📊 Total Green Credits: <strong>${Object.values(credits).reduce((a, b) => a + b, 0)}</strong></p>
+                                <p>🗑️ Total Complaints: <strong>${complaints.length}</strong></p>
+                                <p>✅ Resolved Complaints: <strong>${complaints.filter(c => c.status === 'Resolved').length}</strong></p>
+                                <p>♻️ E-Waste Collected: <strong>${eWaste.length} items</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAdminCitizens() {
+            let users = JSON.parse(localStorage.getItem(STORAGE_USERS));
+            let credits = JSON.parse(localStorage.getItem(STORAGE_CREDITS));
+            let citizens = users.filter(u => u.role === 'user');
+
+            return `
+                <div class="page-header">
+                    <h1><i class="fas fa-users"></i> Citizen Management</h1>
+                </div>
+                <div class="page-content">
+                    <div class="card">
+                        <h3><i class="fas fa-list"></i> All Citizens</h3>
+                        ${citizens.map(c => `
+                            <div class="request-item">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <strong><i class="fas fa-user"></i> ${c.name}</strong>
+                                    <span class="status-completed"><i class="fas fa-coins"></i> ${credits[c.id] || 0} GC</span>
+                                </div>
+                                <div>📧 ${c.email}</div>
+                                <div>📍 Zone: ${c.zone || 'Not specified'}</div>
+                                <div>🆔 Member since: ${c.id ? 'Active' : 'New'}</div>
+                            </div>
+                        `).join('') || '<div style="text-align: center; padding: 2rem;">No citizens found</div>'}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Action Functions
+        window.schedulePickup = function() {
+            if (!currentUser) return;
+            let address = document.getElementById('pickupAddress').value;
+            let wasteType = document.getElementById('wasteType').value;
+            let date = document.getElementById('pickupDate').value;
+            let timeSlot = document.getElementById('timeSlot').value;
+            
+            if (!address || !date) {
+                showToast("Please fill all fields", "error");
+                return;
+            }
+            
+            let requests = JSON.parse(localStorage.getItem(STORAGE_REQUESTS));
+            let newId = Date.now();
+            requests.push({
+                id: newId,
+                user_id: currentUser.id,
+                waste_type: wasteType,
+                address: address,
+                date: date,
+                timeSlot: timeSlot,
+                status: "Pending",
+                credits: 5
+            });
+            localStorage.setItem(STORAGE_REQUESTS, JSON.stringify(requests));
+            addCredits(currentUser.id, 5);
+            showToast("Pickup scheduled successfully! +5 Credits", "success");
+            document.getElementById('pickupAddress').value = '';
+            navigateTo('history');
+        };
+
+        window.requestEwaste = function() {
+            if (!currentUser) return;
+            let item = document.getElementById('ewasteItem').value;
+            let category = document.getElementById('ewasteCategory').value;
+            let quantity = document.getElementById('ewasteQty').value;
+            
+            if (!item) {
+                showToast("Please enter item details", "error");
+                return;
+            }
+            
+            let eWaste = JSON.parse(localStorage.getItem(STORAGE_EWASTE));
+            let newId = Date.now();
+            eWaste.push({
+                id: newId,
+                user_id: currentUser.id,
+                item: item,
+                category: category,
+                quantity: parseInt(quantity),
+                status: "Pending",
+                credits: 15,
+                date: new Date().toISOString().split('T')[0]
+            });
+            localStorage.setItem(STORAGE_EWASTE, JSON.stringify(eWaste));
+            addCredits(currentUser.id, 15);
+            showToast("E-Waste pickup requested! +15 Credits", "success");
+            document.getElementById('ewasteItem').value = '';
+            navigateTo('history');
+        };
+
+        window.submitComplaint = function() {
+            if (!currentUser) return;
+            let description = document.getElementById('complaintDesc').value;
+            let location = document.getElementById('complaintLocation').value;
+            let lat = document.getElementById('complaintLat').value;
+            let lng = document.getElementById('complaintLng').value;
+            
+            if (!description || !location) {
+                showToast("Please fill all fields", "error");
+                return;
+            }
+            
+            let complaints = JSON.parse(localStorage.getItem(STORAGE_COMPLAINTS));
+            let newId = Date.now();
+            complaints.push({
+                id: newId,
+                user_id: currentUser.id,
+                description: description,
+                location: location,
+                lat: lat || "Not tagged",
+                lng: lng || "Not tagged",
+                status: "Pending",
+                date: new Date().toISOString().split('T')[0]
+            });
+            localStorage.setItem(STORAGE_COMPLAINTS, JSON.stringify(complaints));
+            showToast("Complaint submitted! Admin will review.", "success");
+            document.getElementById('complaintDesc').value = '';
+            document.getElementById('complaintLocation').value = '';
+            navigateTo('history');
+        };
+
+        window.getLocation = function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    pos => {
+                        document.getElementById('complaintLat').value = pos.coords.latitude;
+                        document.getElementById('complaintLng').value = pos.coords.longitude;
+                        showToast(`📍 Location captured!`, "success");
+                    },
+                    () => showToast("Location access denied", "error")
+                );
+            } else {
+                showToast("Geolocation not supported", "error");
+            }
+        };
+
+        window.getUserLocationCentres = function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    pos => {
+                        document.getElementById('userLocationDisplay').innerHTML = `📍 Your location: ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`;
+                        showToast("Showing centres near your location", "success");
+                    },
+                    () => showToast("Location access denied", "error")
+                );
+            } else {
+                showToast("Geolocation not supported", "error");
+            }
+        };
+
+        window.completeRequest = function(id) {
+            let requests = JSON.parse(localStorage.getItem(STORAGE_REQUESTS));
+            let req = requests.find(r => r.id === id);
+            if (req) {
+                req.status = "Completed";
+                localStorage.setItem(STORAGE_REQUESTS, JSON.stringify(requests));
+                addCredits(req.user_id, 10);
+                showToast("Request marked as completed! +10 Credits to citizen", "success");
+                navigateTo('requests');
+            } else {
+                let eWaste = JSON.parse(localStorage.getItem(STORAGE_EWASTE));
+                let eReq = eWaste.find(e => e.id === id);
+                if (eReq) {
+                    eReq.status = "Completed";
+                    localStorage.setItem(STORAGE_EWASTE, JSON.stringify(eWaste));
+                    addCredits(eReq.user_id, 20);
+                    showToast("E-Waste request completed! +20 Credits", "success");
+                    navigateTo('requests');
+                }
+            }
+        };
+
+        window.resolveComplaint = function(id) {
+            let complaints = JSON.parse(localStorage.getItem(STORAGE_COMPLAINTS));
+            let comp = complaints.find(c => c.id === id);
+            if (comp) {
+                comp.status = "Resolved";
+                localStorage.setItem(STORAGE_COMPLAINTS, JSON.stringify(complaints));
+                showToast("Complaint resolved!", "success");
+                navigateTo('complaints');
+            }
+        };
+
+        // Navigation
+        function navigateTo(pageId) {
+            currentPage = pageId;
+            updateSidebarInfo();
+            
+            let content = document.getElementById('mainContent');
+            
+            if (currentUser.role === 'user') {
+                switch(pageId) {
+                    case 'dashboard': content.innerHTML = renderUserDashboard(); setTimeout(initCharts, 100); break;
+                    case 'pickup': content.innerHTML = renderPickupPage(); break;
+                    case 'ewaste': content.innerHTML = renderEwastePage(); break;
+                    case 'complaints': content.innerHTML = renderComplaintsPage(); break;
+                    case 'centres': content.innerHTML = renderCentresPage(); break;
+                    case 'history': content.innerHTML = renderHistoryPage(); break;
+                    default: content.innerHTML = renderUserDashboard(); setTimeout(initCharts, 100);
+                }
+            } else {
+                switch(pageId) {
+                    case 'dashboard': content.innerHTML = renderAdminOverview(); setTimeout(initAdminCharts, 100); break;
+                    case 'requests': content.innerHTML = renderAdminRequests(); break;
+                    case 'complaints': content.innerHTML = renderAdminComplaints(); break;
+                    case 'analytics': content.innerHTML = renderAdminAnalytics(); setTimeout(initWasteTypeChart, 100); break;
+                    case 'citizens': content.innerHTML = renderAdminCitizens(); break;
+                    default: content.innerHTML = renderAdminOverview(); setTimeout(initAdminCharts, 100);
+                }
+            }
+            
+            // Update active nav link
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.dataset.page === pageId) {
+                    link.classList.add('active');
+                }
+            });
+            
+            // Close sidebar on mobile
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('open');
+            }
+        }
+
+        function initCharts() {
+            let ctx = document.getElementById('wasteChart');
+            if (ctx && !wasteChart) {
+                wasteChart = new Chart(ctx.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Organic', 'Recyclable', 'E-Waste', 'Hazardous', 'Other'],
+                        datasets: [{ data: [35, 25, 15, 10, 15], backgroundColor: ['#0fef7a', '#0f7aef', '#ef7a0f', '#ef3f0f', '#9b59b6'], borderWidth: 0 }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: true }
+                });
+            }
+        }
+
+        function initAdminCharts() {
+            let ctx = document.getElementById('adminWasteChart');
+            if (ctx) {
+                if (adminChart) adminChart.destroy();
+                adminChart = new Chart(ctx.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Organic', 'Recyclable', 'E-Waste', 'Hazardous', 'Other'],
+                        datasets: [{ data: [35, 25, 15, 10, 15], backgroundColor: ['#0fef7a', '#0f7aef', '#ef7a0f', '#ef3f0f', '#9b59b6'], borderWidth: 0 }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: true }
+                });
+            }
+        }
+
+        function initWasteTypeChart() {
+            let requests = JSON.parse(localStorage.getItem(STORAGE_REQUESTS));
+            let eWaste = JSON.parse(localStorage.getItem(STORAGE_EWASTE));
+            let wasteTypes = {};
+            [...requests, ...eWaste].forEach(r => {
+                let type = r.waste_type || r.category || 'E-Waste';
+                wasteTypes[type] = (wasteTypes[type] || 0) + 1;
+            });
+            
+            let ctx = document.getElementById('wasteTypeChart');
+            if (ctx) {
+                new Chart(ctx.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(wasteTypes),
+                        datasets: [{ label: 'Number of Requests', data: Object.values(wasteTypes), backgroundColor: '#0fef7a', borderRadius: 8 }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { labels: { color: '#e0e0e0' } } } }
+                });
+            }
+        }
+
+        function updateSidebarInfo() {
+            if (!currentUser) return;
+            document.getElementById('sidebarUserName').innerHTML = `<i class="fas fa-user"></i> ${currentUser.name}`;
+            let credits = getUserCredits(currentUser.id);
+            document.getElementById('sidebarCredits').innerHTML = `<i class="fas fa-coins"></i> ${credits} GC`;
+            
+            let navMenu = document.getElementById('navMenu');
+            let navItems = currentUser.role === 'user' ? userNavItems : adminNavItems;
+            
+            navMenu.innerHTML = navItems.map(item => `
+                <li class="nav-item">
+                    <a class="nav-link ${currentPage === item.id ? 'active' : ''}" href="#" data-page="${item.id}" onclick="navigateTo('${item.id}'); return false;">
+                        <i class="fas ${item.icon}"></i>
+                        <span>${item.label}</span>
+                    </a>
+                </li>
+            `).join('');
+        }
+
+        // Auth Functions
+        function showAuthPage() {
+            document.getElementById('sidebar').style.display = 'none';
+            document.getElementById('mainContent').innerHTML = `
+                <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 2rem;">
+                    <div class="card" style="max-width: 450px; width: 100%;">
+                        <div style="text-align: center; margin-bottom: 2rem;">
+                            <i class="fas fa-leaf" style="font-size: 3rem; color: #0fef7a;"></i>
+                            <h2>EcoSmart <span style="color:#0fef7a;">Waste</span></h2>
+                            <p>Green Credits • Smart Recycling • Zero Waste</p>
+                        </div>
+                        <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+                            <button class="btn-primary" onclick="showLogin()" id="loginTabBtn">Login</button>
+                            <button class="btn-secondary" onclick="showRegister()" id="registerTabBtn">Register</button>
+                        </div>
+                        <div id="loginFormContainer">
+                            <div class="form-group">
+                                <input type="email" id="loginEmail" placeholder="Email" value="citizen@ecosmart.com">
+                            </div>
+                            <div class="form-group">
+                                <input type="password" id="loginPassword" placeholder="Password" value="citizen123">
+                            </div>
+                            <button class="btn-primary" onclick="handleLogin()">Sign In →</button>
+                        </div>
+                        <div id="registerFormContainer" style="display: none;">
+                            <div class="form-group">
+                                <input type="text" id="regName" placeholder="Full Name">
+                            </div>
+                            <div class="form-group">
+                                <input type="email" id="regEmail" placeholder="Email">
+                            </div>
+                            <div class="form-group">
+                                <input type="password" id="regPassword" placeholder="Password">
+                            </div>
+                            <div class="form-group">
+                                <select id="regArea">
+                                    <option value="Downtown">Downtown</option>
+                                    <option value="Suburbs">Suburbs</option>
+                                    <option value="Industrial">Industrial Area</option>
+                                </select>
+                            </div>
+                            <button class="btn-primary" onclick="handleRegister()">Create Account →</button>
+                        </div>
+                        <div style="margin-top: 1.5rem; padding: 1rem; background: #1a201f; border-radius: 1rem; font-size: 0.75rem; text-align: center;">
+                            <strong>Demo Accounts:</strong><br>
+                            Admin: admin@ecosmart.com / admin123<br>
+                            Citizen: citizen@ecosmart.com / citizen123
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        window.showLogin = function() {
+            document.getElementById('loginFormContainer').style.display = 'block';
+            document.getElementById('registerFormContainer').style.display = 'none';
+        };
+
+        window.showRegister = function() {
+            document.getElementById('loginFormContainer').style.display = 'none';
+            document.getElementById('registerFormContainer').style.display = 'block';
+        };
+
+        window.handleLogin = function() {
+            let email = document.getElementById('loginEmail').value;
+            let password = document.getElementById('loginPassword').value;
+            let users = JSON.parse(localStorage.getItem(STORAGE_USERS));
+            let user = users.find(u => u.email === email && u.password === password);
+            
+            if (user) {
+                currentUser = user;
+                document.getElementById('sidebar').style.display = 'block';
+                currentPage = 'dashboard';
+                updateSidebarInfo();
+                navigateTo('dashboard');
+            } else {
+                showToast("Invalid credentials!", "error");
+            }
+        };
+
+        window.handleRegister = function() {
+            let name = document.getElementById('regName').value;
+            let email = document.getElementById('regEmail').value;
+            let password = document.getElementById('regPassword').value;
+            let zone = document.getElementById('regArea').value;
+            
+            if (!name || !email || !password) {
+                showToast("Please fill all fields", "error");
+                return;
+            }
+            
+            let users = JSON.parse(localStorage.getItem(STORAGE_USERS));
+            if (users.find(u => u.email === email)) {
+                showToast("Email already exists!", "error");
+                return;
+            }
+            
+            let newId = Math.max(...users.map(u => u.id)) + 1;
+            users.push({ id: newId, name, email, password, role: "user", zone });
+            localStorage.setItem(STORAGE_USERS, JSON.stringify(users));
+            
+            let credits = JSON.parse(localStorage.getItem(STORAGE_CREDITS));
+            credits[newId] = 0;
+            localStorage.setItem(STORAGE_CREDITS, JSON.stringify(credits));
+            
+            showToast("Account created! Please login.", "success");
+            showLogin();
+        };
+
+        window.logout = function() {
+            currentUser = null;
+            document.getElementById('sidebar').style.display = 'none';
+            showAuthPage();
+        };
+
+        window.toggleSidebar = function() {
+            document.getElementById('sidebar').classList.toggle('open');
+        };
+
+        // Initialize
+        initData();
+        showAuthPage();
+        
+        // Set default date for pickup
+        let dateInput = document.getElementById('pickupDate');
+        if (dateInput) {
+            dateInput.value = new Date().toISOString().split('T')[0];
+        }
+    </script>
+</body>
+</html>
